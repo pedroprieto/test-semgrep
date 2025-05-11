@@ -1,0 +1,30 @@
+name: Semggrep Scan Pedro Prieto
+
+on:
+  push:
+    # Ejecutar la acción al hacer un push a la rama "master"
+    branches: [ master ]
+  pull_request:
+    # Ejecutar la acción al hacer una pull request a la rama "master"
+    branches: [ master ]
+
+jobs:
+  semgrep:
+    # Sistema Operativo de la máquina virtual que ejecutará los tests
+    runs-on: ubuntu-latest
+    steps:
+      # Paso 1: clonar el repositorio
+      - uses: actions/checkout@v4
+      - name: Instalar Semgrep
+        run: pip install semgrep
+      # - name: Ejecutar análisis de seguridad
+      #   run: semgrep --config=auto --json --output=semgrep-results.json
+      - name: Ejecutar análisis con reglas personalizadas
+        run: semgrep --config=semgrep-rules.yaml --json --output=semgrep-results.json
+      - name: Mostrar resultados en la salida de GitHub Actions
+        run: cat semgrep-results.json
+      - name: Guardar reporte de Semgrep como artefacto
+        uses: actions/upload-artifact@v3
+        with:
+          name: semgrep-report
+          path: semgrep-results.json
